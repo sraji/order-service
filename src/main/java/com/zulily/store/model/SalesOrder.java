@@ -1,4 +1,4 @@
-package com.zulily.model;
+package com.zulily.store.model;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;

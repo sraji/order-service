@@ -1,4 +1,4 @@
-package com.zulily.Manager;
+package com.zulily.store.manager;
 
 
 import org.joda.time.DateTime;

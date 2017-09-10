@@ -1,7 +1,7 @@
-package com.zulily.Manager;
+package com.zulily.store.manager;
 
-import com.zulily.model.ProductType;
-import com.zulily.model.SalesOrder;
+import com.zulily.store.model.ProductType;
+import com.zulily.store.model.SalesOrder;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
