@@ -15,18 +15,35 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * TODO: Finish validation in the orders controller
  */
 @RestController
-@RequestMapping(value="/order", produces=MediaType.APPLICATION_JSON_VALUE + ";charset=utf-8")
-public class OrderController {
+@RequestMapping(value="/orders", produces=MediaType.APPLICATION_JSON_VALUE + ";charset=utf-8")
+public class OrdersController {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(OrderController.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(OrdersController.class);
 
     @Autowired
     private SalesOrderManager ordersManager;
+
+    @RequestMapping(value = "", method= RequestMethod.GET, consumes=MediaType.APPLICATION_JSON_VALUE + ";charset=utf-8")
+    public ResponseEntity<Collection<SalesOrder>> getOrders() {
+
+        try {
+            Collection<SalesOrder> result = ordersManager.getOrders();
+
+            return new ResponseEntity<Collection<SalesOrder>>(result, HttpStatus.OK);
+        }
+        catch (Exception e) {
+            LOGGER.error("Error retrieving orders");
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @RequestMapping(value = "/{id}", method= RequestMethod.GET, consumes=MediaType.APPLICATION_JSON_VALUE + ";charset=utf-8")
     public ResponseEntity<SalesOrder> getOrders(@PathVariable("id") @Valid final Integer orderId) {
@@ -44,28 +61,31 @@ public class OrderController {
 
 
     /**
-     * Sales Order API: Inserts and gets a sales record. A sales record includes the following attributes:
+     * Sales Order API: Inserts list of sale records and gets record ids.
+     * A sales record includes the following attributes:
      * order_id [int], product [string], count [int], created_at [timestamp], updated_at [timestamp]
-     * @param orderDetails
+     * @param orders
      * @return
      */
     @RequestMapping(value = "", method= RequestMethod.POST, consumes=MediaType.APPLICATION_JSON_VALUE + ";charset=utf-8")
-    public ResponseEntity<Integer> addOrder(@RequestBody(required = true) @Valid final SalesOrder orderDetails) {
+    public ResponseEntity<List<Integer>> addOrders(@RequestBody(required = true) @Valid final List<SalesOrder> orders) {
 
-        LOGGER.info("POST /order");
+        LOGGER.info("POST /orders");
 
         try {
             //TODO: validate orderDetails
 
-            ordersManager.insertOrder(orderDetails);
+            ordersManager.insertOrders(orders);
 
-            LOGGER.debug("Order has been successfully inserted with _id = " + orderDetails.getOrderId());
+            LOGGER.debug("Orders has been successfully inserted");
 
-            return new ResponseEntity<Integer>(Integer.valueOf(orderDetails.getOrderId()), HttpStatus.CREATED);
+            List<Integer> orderIds = orders.stream().map(SalesOrder::getOrderId).collect(Collectors.toList());
+            return new ResponseEntity<List<Integer>>(orderIds, HttpStatus.CREATED);
         }
         catch (Exception e) {
-            LOGGER.error("Error inserted order with recordId {}", orderDetails.getOrderId());
-            return new ResponseEntity<Integer>(Integer.valueOf(orderDetails.getOrderId()), HttpStatus.INTERNAL_SERVER_ERROR);
+            List<Integer> orderIds = orders.stream().map(SalesOrder::getOrderId).collect(Collectors.toList());
+            LOGGER.error("Error inserted order with recordId {}", orderIds.toString());
+            return new ResponseEntity<List<Integer>>(orderIds, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

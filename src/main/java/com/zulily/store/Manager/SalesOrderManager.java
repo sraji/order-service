@@ -16,6 +16,7 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 /**
+ * TODO: Improve javadoc on the manager class, by a bit, especially at the class level, to define what the class does
  * Collection of orders placed
  */
 @Component
@@ -26,6 +27,7 @@ public class SalesOrderManager {
 
         Comparator<CustomSalesOrderKey> sortByUpdatedDate = new Comparator<CustomSalesOrderKey>(){
             public int compare(CustomSalesOrderKey o1, CustomSalesOrderKey o2) {
+                //TODO: Add tie breaker
                 if ( (o1.getUpdatedAt().compareTo(o2.getUpdatedAt())) > 0) {
                     return 1;
                 } else{
@@ -45,6 +47,8 @@ public class SalesOrderManager {
      * @return
      */
     public Set<ProductType> getTopSellingProducts(DateTime begin, DateTime end, Integer count) {
+        //TODO: Validation
+
         // Get all orders with updatedDateTime between begin and end
         Collection<SalesOrder> orders = getSalesOrders(begin, end);
 
