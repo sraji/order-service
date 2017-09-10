@@ -1,7 +1,7 @@
-package com.zulily.store.controller.controller;
+package com.zulily.controller;
 
-import com.zulily.store.controller.Manager.SalesOrderManager;
-import com.zulily.store.controller.model.SalesOrder;
+import com.zulily.Manager.SalesOrderManager;
+import com.zulily.model.SalesOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

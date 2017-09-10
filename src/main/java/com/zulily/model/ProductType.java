@@ -1,4 +1,4 @@
-package com.zulily.store.controller.model;
+package com.zulily.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
