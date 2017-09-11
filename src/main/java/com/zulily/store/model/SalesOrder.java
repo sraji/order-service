@@ -2,22 +2,33 @@ package com.zulily.store.model;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.joda.time.DateTime;
+
+import javax.validation.constraints.NotNull;
 
 /*
 Model representation of an order
 order_id,product,quantity,created_at,updated_at
 546809878,NewBalance Shoes,6,2009-12-10 08:28:04,2015-07-23 18:31:33
 */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class SalesOrder {
 
+    @NotNull
     private Integer orderId;
+
+    @NotNull
     private ProductType product;
+
+    @NotNull
     private Integer quantity;
 
+    @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private DateTime createdAt;
 
+    @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private DateTime updatedAt;
 

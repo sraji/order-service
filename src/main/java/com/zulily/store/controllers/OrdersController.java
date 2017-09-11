@@ -2,19 +2,21 @@ package com.zulily.store.controllers;
 
 import com.zulily.store.manager.SalesOrderManager;
 import com.zulily.store.model.SalesOrder;
+import com.zulily.store.validators.SalesOrderValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,15 +25,18 @@ import java.util.stream.Collectors;
  * TODO: Finish validation in the orders controller
  */
 @RestController
-@RequestMapping(value="/orders", produces=MediaType.APPLICATION_JSON_VALUE + ";charset=utf-8")
+@RequestMapping(value="/orders", consumes=MediaType.APPLICATION_JSON_VALUE + ";charset=utf-8", produces=MediaType.APPLICATION_JSON_VALUE + ";charset=utf-8")
 public class OrdersController {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(OrdersController.class);
 
     @Autowired
+    private SalesOrderValidator salesOrderValidator;
+
+    @Autowired
     private SalesOrderManager ordersManager;
 
-    @RequestMapping(value = "", method= RequestMethod.GET, consumes=MediaType.APPLICATION_JSON_VALUE + ";charset=utf-8")
+    @GetMapping("")
     public ResponseEntity<Collection<SalesOrder>> getOrders() {
 
         try {
@@ -45,8 +50,8 @@ public class OrdersController {
         }
     }
 
-    @RequestMapping(value = "/{id}", method= RequestMethod.GET, consumes=MediaType.APPLICATION_JSON_VALUE + ";charset=utf-8")
-    public ResponseEntity<SalesOrder> getOrders(@PathVariable("id") @Valid final Integer orderId) {
+    @GetMapping("/{id}")
+    public ResponseEntity<SalesOrder> getOrders(@PathVariable("id") final Integer orderId) {
 
         try {
             SalesOrder result = ordersManager.getOrder(orderId);
@@ -67,14 +72,12 @@ public class OrdersController {
      * @param orders
      * @return
      */
-    @RequestMapping(value = "", method= RequestMethod.POST, consumes=MediaType.APPLICATION_JSON_VALUE + ";charset=utf-8")
-    public ResponseEntity<List<Integer>> addOrders(@RequestBody(required = true) @Valid final List<SalesOrder> orders) {
+    @PostMapping("")
+    public ResponseEntity<List<Integer>> addOrders(@RequestBody(required = true) @Validated final List<SalesOrder> orders) {
 
         LOGGER.info("POST /orders");
 
         try {
-            //TODO: validate orderDetails
-
             ordersManager.insertOrders(orders);
 
             LOGGER.debug("Orders has been successfully inserted");
