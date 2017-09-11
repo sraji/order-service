@@ -4,7 +4,7 @@ import com.zulily.store.model.ProductType;
 import com.zulily.store.model.SalesOrder;
 import org.joda.time.DateTime;
 
-public class SaleOderBuilder {
+public class SaleOrderBuilder {
     SalesOrder order = new SalesOrder();
 
     public SalesOrder getSaleOrder() {

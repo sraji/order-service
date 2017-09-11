@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class SalesOrderService {
 
     @Autowired
-    private SaleOrdersCollection saleOrdersPlaced;
+    private SaleOrdersCollection saleOrdersCollection;
 
     /**
      * Returns top selling products in provided timeframe
@@ -38,7 +38,7 @@ public class SalesOrderService {
         }
 
         // Get all orders with updatedDateTime between begin and end
-        Set<SalesOrder> orders = saleOrdersPlaced.getSalesOrders(begin, end);
+        Collection<SalesOrder> orders = saleOrdersCollection.getSalesOrders(begin, end);
 
         // Construct a map: ProductType to total quantity
         Map<ProductType, Integer> totalOrders = orders.stream().collect(Collectors.groupingBy(SalesOrder::getProduct,
@@ -59,7 +59,7 @@ public class SalesOrderService {
      * @return
      */
     public Collection<SalesOrder> getOrders() {
-        return saleOrdersPlaced.getRecords();
+        return saleOrdersCollection.getRecords();
     }
 
     /**
@@ -71,7 +71,7 @@ public class SalesOrderService {
         if (orderId == null) {
             return null;
         }
-        return saleOrdersPlaced.getRecord(orderId);
+        return saleOrdersCollection.getRecord(orderId);
     }
 
     /**
@@ -80,7 +80,7 @@ public class SalesOrderService {
      * @param orderDetails
      */
     public void insertOrder(SalesOrder orderDetails) {
-        saleOrdersPlaced.addRecord(orderDetails);
+        saleOrdersCollection.addRecord(orderDetails);
     }
 
     /**
@@ -93,7 +93,7 @@ public class SalesOrderService {
             return;
         }
 
-        saleOrdersPlaced.addRecords(orderDetails);
+        saleOrdersCollection.addRecords(orderDetails);
     }
 }
 

@@ -3,51 +3,65 @@ package com.zulily.store.data;
 import com.zulily.store.model.SalesOrder;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.TreeMap;
 
 @Component
 public class SaleOrdersCollection {
 
-    private TreeMap<DateTime, Set<SalesOrder>> orderedSales;
-    private HashMap<Integer, SalesOrder> map;
+    private TreeMap<CompoundSaleOrderKey, SalesOrder> orderedSales;
+    private HashMap<Integer, CompoundSaleOrderKey> orderIdToCompoundKeyMap;
 
     public SaleOrdersCollection() {
         orderedSales = new TreeMap();
-        map = new HashMap<>();
+        orderIdToCompoundKeyMap = new HashMap<>();
     }
 
     public Collection<SalesOrder> getRecords() {
-        return this.map.values();
+        return this.orderedSales.values();
     }
 
     public SalesOrder getRecord(Integer orderId) {
-        return this.map.get(orderId);
+        if (orderId == null) {
+            return null;
+        }
+        // Get compoundKey from orderIdToCompoundKeyMap
+        CompoundSaleOrderKey key = orderIdToCompoundKeyMap.get(orderId);
+
+        if (key != null) {
+            return orderedSales.get(key);
+        }
+
+        return null;
     }
 
     public void addRecord(SalesOrder orderDetails) {
-        this.map.put(orderDetails.getOrderId(), orderDetails);
-
-        if (orderedSales.containsKey(orderDetails.getUpdatedAt())) {
-            Set<SalesOrder> orders = orderedSales.get(orderDetails.getUpdatedAt());
-            orders.add(orderDetails);
-            this.orderedSales.put(orderDetails.getUpdatedAt(), orders);
-        }
-        else {
-            Set<SalesOrder> orders = new HashSet<>();
-            orders.add(orderDetails);
-            this.orderedSales.put(orderDetails.getUpdatedAt(), orders);
+        if (orderDetails == null) {
+            return;
         }
 
+        CompoundSaleOrderKey compoundKey = new CompoundSaleOrderKey(orderDetails);
+
+        this.orderIdToCompoundKeyMap.put(orderDetails.getOrderId(), compoundKey);
+
+        //TODO: Duplicate record
+//        if (orderedSales.containsKey(compoundKey)) {
+//            orderedSales.remove(compoundKey);
+//        }
+
+        this.orderedSales.put(compoundKey, orderDetails);
     }
 
     public void addRecords(List<SalesOrder> orderDetails) {
+        if (CollectionUtils.isEmpty(orderDetails)) {
+            return;
+        }
+
         Iterator<SalesOrder> iter = orderDetails.iterator();
 
         while (iter.hasNext()) {
@@ -55,15 +69,13 @@ public class SaleOrdersCollection {
         }
     }
 
-    public Set<SalesOrder> getSalesOrders(DateTime begin, DateTime end) {
-        Set<SalesOrder> result = new HashSet<>();
-        Collection<Set<SalesOrder>> orders = orderedSales.subMap(begin, true, end,true).values();
+    public Collection<SalesOrder> getSalesOrders(DateTime begin, DateTime end) {
 
-        Iterator<Set<SalesOrder>> iter = orders.iterator();
-        while (iter.hasNext()) {
-            result.addAll(iter.next());
-        }
+        CompoundSaleOrderKey beginDt = new CompoundSaleOrderKey(begin);
+        CompoundSaleOrderKey endDt = new CompoundSaleOrderKey(end);
 
-        return result;
+        Collection<SalesOrder> orders = orderedSales.subMap(beginDt, true, endDt,true).values();
+
+        return orders;
     }
 }

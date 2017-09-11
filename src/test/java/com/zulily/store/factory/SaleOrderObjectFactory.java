@@ -28,8 +28,8 @@ public class SaleOrderObjectFactory {
         order.setQuantity(rand.nextInt(100));
 
         DateTime ct = new DateTime();
-        ct.withYear(2000);
-        ct.plusHours(2);
+        ct = ct.withYear(2000);
+        ct = ct.plusHours(2);
 
         order.setCreatedAt(ct);
 
