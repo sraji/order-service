@@ -1,8 +1,7 @@
 package com.zulily.store.controllers;
 
-import com.zulily.store.manager.SalesOrderManager;
+import com.zulily.store.services.SalesOrderService;
 import com.zulily.store.model.SalesOrder;
-import com.zulily.store.validators.SalesOrderValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,17 +29,15 @@ public class OrdersController {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(OrdersController.class);
 
-    @Autowired
-    private SalesOrderValidator salesOrderValidator;
 
     @Autowired
-    private SalesOrderManager ordersManager;
+    private SalesOrderService salesOrderService;
 
     @GetMapping("")
     public ResponseEntity<Collection<SalesOrder>> getOrders() {
 
         try {
-            Collection<SalesOrder> result = ordersManager.getOrders();
+            Collection<SalesOrder> result = salesOrderService.getOrders();
 
             return new ResponseEntity<Collection<SalesOrder>>(result, HttpStatus.OK);
         }
@@ -54,8 +51,11 @@ public class OrdersController {
     public ResponseEntity<SalesOrder> getOrders(@PathVariable("id") final Integer orderId) {
 
         try {
-            SalesOrder result = ordersManager.getOrder(orderId);
+            SalesOrder result = salesOrderService.getOrder(orderId);
 
+            if (result == null) {
+                return new ResponseEntity<SalesOrder>(result, HttpStatus.NOT_FOUND);
+            }
             return new ResponseEntity<SalesOrder>(result, HttpStatus.OK);
         }
         catch (Exception e) {
@@ -78,7 +78,7 @@ public class OrdersController {
         LOGGER.info("POST /orders");
 
         try {
-            ordersManager.insertOrders(orders);
+            salesOrderService.insertOrders(orders);
 
             LOGGER.debug("Orders has been successfully inserted");
 

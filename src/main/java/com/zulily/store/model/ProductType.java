@@ -1,6 +1,7 @@
 package com.zulily.store.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * Enum for list of products
@@ -39,6 +40,11 @@ public enum ProductType {
             }
         }
         throw new IllegalArgumentException(value);
+    }
+
+    @JsonValue
+    public String toValue() {
+        return value;
     }
 
 }

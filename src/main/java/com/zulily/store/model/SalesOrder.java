@@ -13,7 +13,7 @@ order_id,product,quantity,created_at,updated_at
 546809878,NewBalance Shoes,6,2009-12-10 08:28:04,2015-07-23 18:31:33
 */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SalesOrder {
+public class SalesOrder{
 
     @NotNull
     private Integer orderId;
@@ -82,5 +82,13 @@ public class SalesOrder {
 
     public void setUpdatedAt(DateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if(object==null){
+            return false;
+        }
+        return this.getOrderId() == ((SalesOrder)object).getOrderId();
     }
 }

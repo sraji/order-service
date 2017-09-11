@@ -2,6 +2,8 @@ package com.zulily.store.validators;
 
 
 import com.zulily.store.model.SalesOrder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
@@ -9,6 +11,8 @@ import org.springframework.validation.Validator;
 
 @Component
 public class SalesOrderValidator implements Validator{
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(SalesOrderValidator.class);
 
     public boolean supports(Class clazz) {
         return SalesOrder.class.isAssignableFrom(clazz);
@@ -29,6 +33,7 @@ public class SalesOrderValidator implements Validator{
             }
         }
         catch (Exception e) {
+            LOGGER.error("Error validating sales order input");
             return;
         }
     }

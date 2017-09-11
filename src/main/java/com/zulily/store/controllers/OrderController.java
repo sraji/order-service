@@ -1,7 +1,7 @@
 package com.zulily.store.controllers;
 
 import com.zulily.store.controllers.responses.AddOrderResponse;
-import com.zulily.store.manager.SalesOrderManager;
+import com.zulily.store.services.SalesOrderService;
 import com.zulily.store.model.SalesOrder;
 import com.zulily.store.validators.SalesOrderValidator;
 import org.slf4j.Logger;
@@ -33,7 +33,7 @@ public class OrderController {
     private SalesOrderValidator salesOrderValidator;
 
     @Autowired
-    private SalesOrderManager ordersManager;
+    private SalesOrderService salesOrderService;
 
     @InitBinder
     protected void initBinder(WebDataBinder binder) {
@@ -45,7 +45,11 @@ public class OrderController {
     public ResponseEntity<SalesOrder> getOrders(@PathVariable("id") final Integer orderId) {
 
         try {
-            SalesOrder result = ordersManager.getOrder(orderId);
+            SalesOrder result = salesOrderService.getOrder(orderId);
+
+            if (result == null) {
+                return new ResponseEntity<SalesOrder>(result, HttpStatus.NOT_FOUND);
+            }
 
             return new ResponseEntity<SalesOrder>(result, HttpStatus.OK);
         }
@@ -79,9 +83,9 @@ public class OrderController {
         response.setOrderId(orderDetails.getOrderId());
 
         try {
-            ordersManager.insertOrder(orderDetails);
+            salesOrderService.insertOrder(orderDetails);
 
-            LOGGER.debug("Order has been successfully inserted with _id = " + orderDetails.getOrderId());
+            LOGGER.debug("Order has been successfully inserted with id {} ", orderDetails.getOrderId());
 
             return new ResponseEntity<AddOrderResponse>(response, HttpStatus.CREATED);
         }

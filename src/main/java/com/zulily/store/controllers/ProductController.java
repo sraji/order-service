@@ -3,7 +3,7 @@ package com.zulily.store.controllers;
 import com.zulily.store.controllers.exceptions.InvalidInputException;
 import com.zulily.store.controllers.responses.Error;
 import com.zulily.store.controllers.responses.TopSellingProductsResponse;
-import com.zulily.store.manager.SalesOrderManager;
+import com.zulily.store.services.SalesOrderService;
 import com.zulily.store.model.ProductType;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -26,13 +26,18 @@ import java.util.Set;
 public class ProductController {
     private final static Logger LOGGER = LoggerFactory.getLogger(ProductController.class);
 
+    private static final int INVALID_DATES_ERROR_CODE = 4000;
+    private static final int INVALID_COUNT_ERROR_CODE = 5000;
+    private static final int UNKNOWN_ERROR_CODE = 6000;
+
     @Autowired
-    private SalesOrderManager ordersManager;
+    private SalesOrderService salesOrderService;
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Error> exceptionHandler(Exception ex) {
         Error e = new Error();
         e.setDescription(ex.getMessage());
+        e.setErrorCode(UNKNOWN_ERROR_CODE);
         return new ResponseEntity<Error>(e, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -40,6 +45,7 @@ public class ProductController {
     public ResponseEntity<Error> invalidInputExceptionHandler(InvalidInputException ex) {
         Error e = new Error();
         e.setDescription(ex.getMessage());
+        e.setErrorCode(ex.getErrorCode());
         return new ResponseEntity<Error>(e, HttpStatus.BAD_REQUEST);
     }
 
@@ -52,14 +58,14 @@ public class ProductController {
 
         try {
             if (begin.compareTo(end) > 0) {
-                throw new InvalidInputException("begin date cannot be greater than end", 4000);
+                throw new InvalidInputException("begin date cannot be greater than end", INVALID_DATES_ERROR_CODE);
             }
 
             if (count < 0) {
-                throw new InvalidInputException("count cannot be negative", 4001);
+                throw new InvalidInputException("count cannot be negative", INVALID_COUNT_ERROR_CODE);
             }
 
-            Set<ProductType> products = ordersManager.getTopSellingProducts(begin, end, count);
+            Set<ProductType> products = salesOrderService.getTopSellingProducts(begin, end, count);
             response.setProducts(products);
             return new ResponseEntity<TopSellingProductsResponse>(response, HttpStatus.OK);
         }
